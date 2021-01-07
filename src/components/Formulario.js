@@ -4,10 +4,9 @@ import React, { useState } from 'react';
 
 import styled from '@emotion/styled';
 
-
 // **************************************************************************** //
 
-import { obtenerDiferenciaYear } from '../helper';
+import { obtenerDiferenciaYear, calcularMarca, obtenerPlan } from '../helper';
 
 // **************************************************************************** //
 
@@ -60,7 +59,7 @@ const Error = styled.div`
     margin-bottom: 2rem;
 `;
 
-const Formulario = () => {
+const Formulario = ( { guardarResumen, guardarCargando } ) => {
 
     const [ datos, guardarDatos ] = useState({
         marca: '',
@@ -103,23 +102,39 @@ const Formulario = () => {
 
         // Obtain year difference
         const diferencia = obtenerDiferenciaYear( year );
-        console.log(diferencia);
 
         // Each year substrac the 3%
         resultado -= ( ( diferencia * 3 ) *  resultado ) / 100;
-
-        console.log( resultado )
 
         /**
          * American 0.15 - 15%
          * Asiatic 0.05 - 0.5%
          * Europeo 0.30 - 30%
          */
+        resultado = calcularMarca(marca) * resultado;
 
         // Basic increases 20%
-        // Completo increases 50%
+        // Complete increases 50%
+        const incrementoPlan = obtenerPlan( plan );
 
-        //  Total 
+        resultado = parseFloat( incrementoPlan * resultado ).toFixed(2);
+
+        guardarCargando(true);
+
+        setTimeout( () => {
+
+            // Elimina el spinner
+            guardarCargando(false);
+
+            //  Total
+            guardarResumen({
+                cotizacion: Number(resultado),
+                datos
+            });
+
+        }, 3000);
+
+     
 
     };
 
